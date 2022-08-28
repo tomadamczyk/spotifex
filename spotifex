@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+CLIENT_ID=""
+CLIENT_SECRET=""
+
+
+TOKEN_URI="https://accounts.spotify.com/api/token";
+CREDENTIALS=$(printf "${CLIENT_ID}:${CLIENT_SECRET}" | base64 | tr -d "\n"|tr -d '\r');
+
+showHelp () {
+	echo "Spotifex allows you to control your Spotify from the console."
+}
+
+getAccessToken () {
+	echo "Getting access token";
+
+   	TOKEN_RESPONSE=$( \
+        curl "${TOKEN_URI}" \
+        --silent \
+        -X "POST" \
+        -H "Authorization: Basic ${CREDENTIALS}" \
+        -d "grant_type=client_credentials" \
+     )
+    echo ${TOKEN_RESPONSE}
+}
+
+showHelp;
+getAccessToken;
