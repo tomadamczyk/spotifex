@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-CLIENT_ID=""
-CLIENT_SECRET=""
+CLIENT_ID="a78b77603211432f92486fdfceab9112"
+CLIENT_SECRET="20ff4319a5e4446fa5ef33d1b97d0211"
 
 
 TOKEN_URI="https://accounts.spotify.com/api/token";
+PLAY_URI="https://api.spotify.com/v1/artists/0TnOYISbd1XYRBk9myaseg"
 CREDENTIALS=$(printf "${CLIENT_ID}:${CLIENT_SECRET}" | base64 | tr -d "\n"|tr -d '\r');
 
 showHelp () {
@@ -21,8 +22,29 @@ getAccessToken () {
         -H "Authorization: Basic ${CREDENTIALS}" \
         -d "grant_type=client_credentials" \
      )
-    echo ${TOKEN_RESPONSE}
+    TOKEN=$( \
+        printf "${TOKEN_RESPONSE}" \
+        | command grep -E -o '"access_token":".*",' \
+        | sed 's/"access_token"://g' \
+        | sed 's/"//g' \
+        | sed 's/,.*//g' \
+    )
+    echo ${TOKEN}
+}
+
+getArtistInfo () {
+    echo "Starting/resuming playback"
+    RESPONSE=$( \
+        curl "${PLAY_URI}" \
+        --silent \
+        -X "GET" \
+        -H "Authorization: Bearer ${TOKEN}" \
+        -H "Content-Type: application/json" \
+    )
+    echo ${RESPONSE}
 }
 
 showHelp;
 getAccessToken;
+getArtistInfo;
+
